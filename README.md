@@ -23,17 +23,14 @@ Click **Use this template** (or Fork) to copy this repository into your own GitH
    | Summary | Text | (optional) Shown in the post list |
 
 4. On the database page, click `···` (top right) → **Connections** → connect the integration you just created. (Without this, the API only ever returns an empty list.)
-5. Open the database in your browser and copy the 32-character ID from the URL. (`database_id`)
+5. Open the database in your browser and copy the 32-character ID from the URL. (`NOTION_DATABASE_ID`)
    In `https://www.notion.so/xxxx/1a2b3c...32 chars...?v=...`, it's the `1a2b3c...` part.
 
 ## 2. Fill in config.yml
 
-Open `config.yml` at the repo root. **This file gets committed to the repo, so no secrets go here** — the one secret, `NOTION_TOKEN`, is registered separately in step 3 below.
+Open `config.yml` at the repo root. **This file gets committed to the repo, so no secrets go here** — those (`NOTION_TOKEN`, `NOTION_DATABASE_ID`) are registered separately in step 3 below.
 
 ```yaml
-notion:
-  database_id: "your-32-character-database-id"
-
 site:
   title: "My Blog"
   base_path: ""        # "/repo-name" for username.github.io/repo-name, "" for username.github.io
@@ -48,8 +45,14 @@ deploy:
 
 ## 3. Configure the GitHub repository
 
-1. Go to **Settings → Secrets and variables → Actions → Secrets** and add:
-   - `NOTION_TOKEN`
+1. Register the secrets. With the [GitHub CLI](https://cli.github.com/) installed and logged in (`gh auth login`), run these from the repo folder:
+
+   ```bash
+   gh secret set NOTION_TOKEN
+   gh secret set NOTION_DATABASE_ID
+   ```
+
+   Each prompts you to paste the value. No CLI? Go to **Settings → Secrets and variables → Actions → Secrets → New repository secret** and add both `NOTION_TOKEN` and `NOTION_DATABASE_ID` there instead.
 2. Go to **Settings → Pages** → Source: `Deploy from a branch` → Branch: `main`, folder: `/docs` → Save.
 3. Go to the **Actions** tab → select the `Build and Deploy Blog` workflow → **Run workflow** to trigger the first build manually.
 
@@ -70,7 +73,7 @@ If you'd rather not run any automation, set `auto_sync` to `false` in `config.ym
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # fill in NOTION_TOKEN
+cp .env.example .env   # fill in NOTION_TOKEN and NOTION_DATABASE_ID
 python build.py
 python -m http.server --directory docs 8000   # check http://localhost:8000
 ```
@@ -78,7 +81,7 @@ python -m http.server --directory docs 8000   # check http://localhost:8000
 ## Project structure
 
 ```
-config.yml            # site config (database_id, title, sidebar info, auto_sync)
+config.yml            # site config (title, sidebar info, auto_sync)
 notion_blog/
   config.py            # loads config.yml
   notion_api.py        # Notion API calls (database query, recursive block fetch)

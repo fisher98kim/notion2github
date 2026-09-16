@@ -31,7 +31,7 @@ ABOUT_SLUG = "about"
 def build_site() -> None:
     config = load_config()
     token = os.environ["NOTION_TOKEN"]
-    database_id = config["notion"]["database_id"]
+    database_id = os.environ["NOTION_DATABASE_ID"]
 
     site = config.get("site") or {}
     site_title = site.get("title") or "My Notion Blog"

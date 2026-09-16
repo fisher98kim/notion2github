@@ -1,11 +1,6 @@
 # notion2github site configuration.
 # This file is safe to commit — it holds no secrets.
-# The only secret (NOTION_TOKEN) lives in GitHub Actions Secrets / your local .env.
-
-notion:
-  # The 32-character ID from your Notion database URL:
-  # https://www.notion.so/xxxx/1a2b3c...32-chars...?v=...
-  database_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+# NOTION_TOKEN and NOTION_DATABASE_ID live in GitHub Actions Secrets / your local .env instead.
 
 site:
   title: "My Notion Blog"

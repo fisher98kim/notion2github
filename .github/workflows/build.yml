@@ -38,6 +38,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || steps.config.outputs.auto_sync == 'true'
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
         run: python build.py
 
       - name: Commit and push if changed
