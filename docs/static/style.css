@@ -51,6 +51,25 @@ body {
 .content-topbar { color: var(--bs-secondary-color); }
 .content-topbar a:hover { color: var(--bs-body-color); }
 
+/* ---- Search box ---- */
+.search-box {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+}
+.search-box .bi {
+  position: absolute;
+  left: .8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--bs-secondary-color);
+  pointer-events: none;
+}
+.search-box input {
+  border-radius: 2rem;
+  padding-left: 2.1rem;
+}
+
 /* ---- Post list / post meta ---- */
 .post-item-title { color: var(--bs-link-color); }
 .post-item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .15rem .5rem; }
