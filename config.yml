@@ -6,13 +6,13 @@ site:
   title: "My Notion Blog"
 
   # Project page (username.github.io/repo) -> "/repo". User/Org page (username.github.io) -> "".
-  base_path: ""
+  base_path: "/notion2github"
 
   # Everything below is optional. Leave blank to hide that part of the sidebar.
-  tagline: ""
+  tagline: "Notion Database to Github Page!"
   avatar: ""
-  github_url: ""
-  email: ""
+  github_url: "https://github.com/fisher98kim"
+  email: "fisher98kim@gmail.com"
 
 deploy:
   # true  -> GitHub Actions rebuilds the site automatically (hourly cron + on push).
