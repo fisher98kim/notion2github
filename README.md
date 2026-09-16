@@ -5,7 +5,28 @@ Fill in `config.yml`, and GitHub Actions keeps the site in sync automatically.
 
 ## 0. Start from this template
 
-Click **Use this template** (or Fork) to copy this repository into your own GitHub account.
+Pick whichever of these you're comfortable with — they all end up in the same place: your own repo with this code in it.
+
+**Option A — Use this template (recommended if you're on GitHub's website)**
+Click **Use this template** → **Create a new repository** at the top of this repo's GitHub page. This gives you an independent repo (no "forked from" link) with GitHub Actions already enabled by default.
+
+**Option B — Fork**
+Click **Fork** at the top of this repo's GitHub page. Simplest click, but GitHub disables Actions on forks by default — after forking, go to your fork's **Actions** tab and click the button to enable workflows (and note that the scheduled/cron run is less reliable on forks than on an independent repo).
+
+**Option C — Clone it yourself (no GitHub UI needed)**
+If you'd rather work from the terminal, first create an empty repo on GitHub named `<your-username>.github.io` (or any name, for a project page), then:
+
+```bash
+git clone --depth 1 https://github.com/fisher98kim/notion2github.git <your-username>.github.io
+cd <your-username>.github.io
+rm -rf .git && git init
+git remote add origin https://github.com/<your-username>/<your-username>.github.io.git
+git add -A && git commit -m "Initial commit from notion2github"
+git branch -M main
+git push -u origin main
+```
+
+`rm -rf .git` matters here — without it you'd drag this template's commit history (and its original author) into your own repo. Since this creates a plain repo with no fork relationship, Actions works the same as Option A (enabled by default, no extra steps).
 
 ## 1. Set up Notion
 
