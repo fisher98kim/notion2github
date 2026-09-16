@@ -30,9 +30,6 @@
         </div>
 
         <nav class="sidebar-nav mt-4">
-          <a class="sidebar-nav-link{% if not category and not is_about %} active{% endif %}" href="{{ base_path }}/">
-            <i class="bi bi-house"></i> Home
-          </a>
           <a class="sidebar-nav-link{% if is_about %} active{% endif %}" href="{{ base_path }}/about/">
             <i class="bi bi-person"></i> About
           </a>
@@ -52,13 +49,19 @@
       </div>
     </aside>
     <main class="col-12 col-md-9">
-      <nav aria-label="breadcrumb" class="content-topbar small mb-4">
-        <a class="text-decoration-none text-body-secondary" href="{{ base_path }}/">Home</a>
-        {% if category %}<span class="mx-1">&rsaquo;</span><span>{{ category.name }}</span>
-        {% elif is_about %}<span class="mx-1">&rsaquo;</span><span>About</span>
-        {% elif title %}<span class="mx-1">&rsaquo;</span><span>{{ title }}</span>
-        {% endif %}
-      </nav>
+      <div class="content-topbar d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <nav aria-label="breadcrumb" class="small">
+          <a class="text-decoration-none text-body-secondary" href="{{ base_path }}/">Home</a>
+          {% if category %}<span class="mx-1">&rsaquo;</span><span>{{ category.name }}</span>
+          {% elif is_about %}<span class="mx-1">&rsaquo;</span><span>About</span>
+          {% elif title %}<span class="mx-1">&rsaquo;</span><span>{{ title }}</span>
+          {% endif %}
+        </nav>
+        <div class="search-box">
+          <i class="bi bi-search"></i>
+          <input type="search" class="form-control form-control-sm" placeholder="Search...">
+        </div>
+      </div>
       {% block content %}{% endblock %}
     </main>
   </div>
