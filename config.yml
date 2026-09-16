@@ -1,0 +1,26 @@
+# notion2github site configuration.
+# This file is safe to commit — it holds no secrets.
+# The only secret (NOTION_TOKEN) lives in GitHub Actions Secrets / your local .env.
+
+notion:
+  # The 32-character ID from your Notion database URL:
+  # https://www.notion.so/xxxx/1a2b3c...32-chars...?v=...
+  database_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+site:
+  title: "My Notion Blog"
+
+  # Project page (username.github.io/repo) -> "/repo". User/Org page (username.github.io) -> "".
+  base_path: ""
+
+  # Everything below is optional. Leave blank to hide that part of the sidebar.
+  tagline: ""
+  avatar: ""
+  github_url: ""
+  email: ""
+
+deploy:
+  # true  -> GitHub Actions rebuilds the site automatically (hourly cron + on push).
+  # false -> automatic rebuilds are skipped; you can still trigger a build any time
+  #          from the Actions tab ("Run workflow"), regardless of this setting.
+  auto_sync: true
