@@ -91,14 +91,32 @@ If you'd rather not run any automation, set `auto_sync` to `false` in `config.ym
 
 ## 5. Build and test locally
 
+**One-time setup:**
+
+```bash
+./init.sh
+```
+
+Creates `.venv`, installs dependencies, and (on first run only) asks for your `NOTION_TOKEN` and `NOTION_DATABASE_ID` to write into `.env`. Safe to re-run any time — it leaves an existing `.env` alone.
+
+**Every time after that:**
+
+```bash
+./build_local.sh
+```
+
+Rebuilds the site from Notion and serves it at http://localhost:8000. Under the hood this just activates `.venv` and runs `python build.py --local`.
+
+`--local` ignores `config.yml`'s `base_path` for this run only (without editing the file). Without it (`python build.py`), the site builds using the real `base_path` — correct for what actually gets deployed, but its links only resolve once served from that subpath, so opening the build via a plain `http.server` locally will look broken.
+
+Prefer doing it by hand instead of running scripts? That's just:
+
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # fill in NOTION_TOKEN and NOTION_DATABASE_ID
-python build.py --local   # builds + serves docs/ at http://localhost:8000
+python build.py --local
 ```
-
-`--local` ignores `config.yml`'s `base_path` for this run only (without editing the file) and starts the server for you. Without it (`python build.py`), the site builds using the real `base_path` — correct for what actually gets deployed, but its links only resolve once served from that subpath, so opening `docs/index.html` directly or via a plain `http.server` will look broken locally.
 
 ## Project structure
 
