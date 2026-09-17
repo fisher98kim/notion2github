@@ -95,9 +95,10 @@ If you'd rather not run any automation, set `auto_sync` to `false` in `config.ym
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # fill in NOTION_TOKEN and NOTION_DATABASE_ID
-python build.py
-python -m http.server --directory docs 8000   # check http://localhost:8000
+python build.py --local   # builds + serves docs/ at http://localhost:8000
 ```
+
+`--local` ignores `config.yml`'s `base_path` for this run only (without editing the file) and starts the server for you. Without it (`python build.py`), the site builds using the real `base_path` — correct for what actually gets deployed, but its links only resolve once served from that subpath, so opening `docs/index.html` directly or via a plain `http.server` will look broken locally.
 
 ## Project structure
 

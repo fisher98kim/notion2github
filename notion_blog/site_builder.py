@@ -30,14 +30,17 @@ OUTPUT_DIR = ROOT / "docs"
 ABOUT_SLUG = "about"
 
 
-def build_site() -> None:
+def build_site(local: bool = False) -> None:
     config = load_config()
     token = os.environ["NOTION_TOKEN"]
     database_id = os.environ["NOTION_DATABASE_ID"]
 
     site = config.get("site") or {}
     site_title = site.get("title") or "My Notion Blog"
-    base_path = (site.get("base_path") or "").rstrip("/")
+    # base_path is only meaningful once the site is deployed under a
+    # subpath (a GitHub Pages project page); a local preview is always
+    # served from "/", so config.yml's value would break every link.
+    base_path = "" if local else (site.get("base_path") or "").rstrip("/")
 
     profile_context = {
         "tagline": site.get("tagline") or "",
