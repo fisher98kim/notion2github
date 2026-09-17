@@ -159,4 +159,4 @@ build.py                  # entry point: python build.py
 
 ## Supported Notion blocks
 
-Paragraphs, headings (H1-H3), bulleted/numbered lists (including nesting), quotes, dividers, code, images, to-dos, callouts, bookmarks, toggles, tables, PDFs, file attachments. Other block types (embeds, equation blocks) are skipped.
+Paragraphs, headings (H1-H3), bulleted/numbered lists (including nesting), quotes, dividers, code, images, to-dos, callouts, bookmarks, toggles, tables, PDFs, file attachments, equations (both inline and block, rendered with KaTeX). Other block types (embeds, videos, child pages) are skipped.
