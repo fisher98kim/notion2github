@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 .env
+
+# Build output — deployed straight to GitHub Pages by the Actions workflow,
+# no longer committed to the repo.
+docs/

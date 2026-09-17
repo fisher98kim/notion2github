@@ -78,8 +78,9 @@ deploy:
    ```
 
    Each prompts you to paste the value. No CLI? Go to **Settings → Secrets and variables → Actions → Secrets → New repository secret** and add both `NOTION_TOKEN` and `NOTION_DATABASE_ID` there instead.
-2. Go to **Settings → Pages** → Source: `Deploy from a branch` → Branch: `main`, folder: `/docs` → Save.
-3. Go to the **Actions** tab → select the `Build and Deploy Blog` workflow → **Run workflow** to trigger the first build manually.
+2. Go to the **Actions** tab → select the `Build and Deploy Blog` workflow → **Run workflow** to trigger the first build manually.
+
+   No need to touch **Settings → Pages** yourself — the workflow enables GitHub Pages for you (via `actions/configure-pages`) the first time it runs.
 
 ## 4. Automatic syncing
 
@@ -87,7 +88,7 @@ deploy:
 
 - Runs on an hourly cron schedule and on every push to `main`. If `deploy.auto_sync` in `config.yml` is `false`, these automatic runs are skipped.
 - Manually running it from the Actions tab (**Run workflow**) always works, regardless of the `auto_sync` setting.
-- Fetches every `Publish`-status post from Notion, regenerates `docs/`, and commits & pushes it if anything changed — which triggers a GitHub Pages redeploy.
+- Fetches every `Publish`-status post from Notion, regenerates `docs/`, and deploys it straight to GitHub Pages (no commit to `main` involved).
 
 In short: write a post in Notion, flip its Status to `Publish`, and it shows up on your blog within the hour.
 
