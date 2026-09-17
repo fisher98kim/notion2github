@@ -53,7 +53,7 @@ git push -u origin main
 
 ## 2. Fill in config.yml
 
-Open `config.yml` at the repo root. **This file gets committed to the repo, so no secrets go here** — those (`NOTION_TOKEN`, `NOTION_DATABASE_ID`) are registered separately in step 3 below.
+`./init.sh` (see section 5) walks you through this interactively — including guessing `base_path` from your git remote — so you can skip straight to section 3 if you're about to run it. Otherwise, open `config.yml` at the repo root by hand. **This file gets committed to the repo, so no secrets go here** — those (`NOTION_TOKEN`, `NOTION_DATABASE_ID`) are registered separately in step 3 below.
 
 ```yaml
 site:
@@ -102,7 +102,7 @@ If you'd rather not run any automation, set `auto_sync` to `false` in `config.ym
 ./init.sh
 ```
 
-Creates `.venv`, installs dependencies, and (on first run only) asks for your `NOTION_TOKEN` and `NOTION_DATABASE_ID` to write into `.env`. Safe to re-run any time — it leaves an existing `.env` alone.
+Creates `.venv`, installs dependencies, and (on first run only) asks for your `NOTION_TOKEN` and `NOTION_DATABASE_ID` to write into `.env`. It then walks through `config.yml` — each prompt shows the current value (or a guess based on your git remote for `base_path`/`github_url`) as the default, so just hit Enter to keep it. Safe to re-run any time — it leaves an existing `.env` alone, and re-running the `config.yml` prompts won't lose anything you've already set.
 
 **Every time after that:**
 
