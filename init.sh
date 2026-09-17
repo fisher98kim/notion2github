@@ -5,6 +5,15 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+cat <<'EOF'
+Setting up notion2github.
+
+Step-by-step guides with screenshots, if you'd like to follow along:
+  Notion setup:  https://fisher98kim.github.io/notion2github/posts/how-to-set-up-notion/
+  GitHub setup:  https://fisher98kim.github.io/notion2github/posts/how-to-set-up-github/
+
+EOF
+
 if [ ! -d .venv ]; then
   echo "Creating virtual environment..."
   python3 -m venv .venv

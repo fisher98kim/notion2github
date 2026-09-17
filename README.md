@@ -3,6 +3,10 @@
 A template that turns a Notion database into a static HTML blog deployed on GitHub Pages.
 Fill in `config.yml`, and GitHub Actions keeps the site in sync automatically.
 
+Prefer following along with screenshots? Step-by-step guides, written on a blog built from this exact template:
+- [How to set up Notion](https://fisher98kim.github.io/notion2github/posts/how-to-set-up-notion/)
+- [How to set up GitHub](https://fisher98kim.github.io/notion2github/posts/how-to-set-up-github/)
+
 ## 0. Start from this template
 
 Pick whichever of these you're comfortable with — they all end up in the same place: your own repo with this code in it.
