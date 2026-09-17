@@ -69,6 +69,23 @@ body {
 .search-box .pagefind-ui__search-input { padding-left: 2.2rem; }
 .search-box .pagefind-ui__search-clear { top: 0; }
 
+/* Float results over the page instead of growing the topbar and pushing
+   the content below it down. */
+.search-box .pagefind-ui__drawer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: .5rem;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: .75rem;
+  padding: .75rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
 /* ---- Post list / post meta ---- */
 .post-item-title { color: var(--bs-link-color); }
 .post-item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .15rem .5rem; }
