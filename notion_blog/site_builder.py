@@ -11,6 +11,7 @@ from jinja2 import Environment, FileSystemLoader
 from . import notion_api
 from .config import load_config
 from .images import localize_images
+from .links import linkify_internal_pages
 from .renderer import (
     blocks_to_html,
     get_date,
@@ -64,28 +65,48 @@ def build_site(local: bool = False) -> None:
     (OUTPUT_DIR / ".nojekyll").touch()
     shutil.copytree(STATIC_DIR, OUTPUT_DIR / "static")
 
-    posts_meta = []
-    posts_content = {}
-    about_page = None
+    # Pass 1: cheap metadata for every page, plus a map from Notion page ID
+    # to this site's own path for it. Built up front so pass 2 can rewrite
+    # in-page links to sibling posts before rendering any HTML.
+    page_meta = []
+    page_id_to_path = {}
     for page in pages:
         title = get_title(page)
         raw_slug = get_rich_text(page, "Slug")
         slug = raw_slug or slugify(title)
-        date = get_date(page, "Date")
-        tags = [{"name": t, "slug": slugify(t)} for t in get_multi_select(page, "Tag")]
-        summary = get_rich_text(page, "Summary")
+        is_about = raw_slug.strip().lower() == ABOUT_SLUG
+        page_meta.append(
+            {
+                "page": page,
+                "title": title,
+                "slug": slug,
+                "is_about": is_about,
+                "date": get_date(page, "Date"),
+                "tags": [{"name": t, "slug": slugify(t)} for t in get_multi_select(page, "Tag")],
+                "summary": get_rich_text(page, "Summary"),
+            }
+        )
+        page_id_to_path[page["id"].replace("-", "").lower()] = (
+            "about" if is_about else f"posts/{slug}"
+        )
 
-        blocks = notion_api.fetch_all_blocks(client, page["id"])
-        blocks = localize_images(blocks, OUTPUT_DIR / "static" / "uploads", slug, base_path)
+    # Pass 2: fetch each page's content and render it.
+    posts_meta = []
+    posts_content = {}
+    about_page = None
+    for meta in page_meta:
+        blocks = notion_api.fetch_all_blocks(client, meta["page"]["id"])
+        blocks = localize_images(blocks, OUTPUT_DIR / "static" / "uploads", meta["slug"], base_path)
+        blocks = linkify_internal_pages(blocks, page_id_to_path, base_path)
         content_html = blocks_to_html(blocks)
 
-        if raw_slug.strip().lower() == ABOUT_SLUG:
-            about_page = {"title": title, "content": content_html}
+        if meta["is_about"]:
+            about_page = {"title": meta["title"], "content": content_html}
             continue
 
-        posts_content[slug] = content_html
+        posts_content[meta["slug"]] = content_html
         posts_meta.append(
-            {"title": title, "slug": slug, "date": date, "tags": tags, "summary": summary}
+            {k: meta[k] for k in ("title", "slug", "date", "tags", "summary")}
         )
 
     posts_meta.sort(key=lambda p: p["date"], reverse=True)
