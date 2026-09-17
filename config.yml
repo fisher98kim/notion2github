@@ -10,7 +10,7 @@ site:
 
   # Everything below is optional. Leave blank to hide that part of the sidebar.
   tagline: "Notion Database to Github Page!"
-  avatar: ""
+  avatar: "https://github.com/fisher98kim.png"
   github_url: "https://github.com/fisher98kim"
   email: "fisher98kim@gmail.com"
 
