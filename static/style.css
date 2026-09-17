@@ -51,24 +51,23 @@ body {
 .content-topbar { color: var(--bs-secondary-color); }
 .content-topbar a:hover { color: var(--bs-body-color); }
 
-/* ---- Search box ---- */
+/* ---- Search box (Pagefind) ---- */
 .search-box {
-  position: relative;
+  --pagefind-ui-scale: 0.8;
+  --pagefind-ui-primary: var(--bs-body-color);
+  --pagefind-ui-text: var(--bs-body-color);
+  --pagefind-ui-background: var(--bs-body-bg);
+  --pagefind-ui-border: var(--bs-border-color);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: 2rem;
+  --pagefind-ui-font: inherit;
   width: 100%;
   max-width: 260px;
+  position: relative;
+  z-index: 10;
 }
-.search-box .bi {
-  position: absolute;
-  left: .8rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--bs-secondary-color);
-  pointer-events: none;
-}
-.search-box input {
-  border-radius: 2rem;
-  padding-left: 2.1rem;
-}
+.search-box .pagefind-ui__search-input { padding-left: 2.2rem; }
+.search-box .pagefind-ui__search-clear { top: 0; }
 
 /* ---- Post list / post meta ---- */
 .post-item-title { color: var(--bs-link-color); }

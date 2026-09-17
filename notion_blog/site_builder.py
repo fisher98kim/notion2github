@@ -2,6 +2,8 @@
 
 import os
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -141,6 +143,10 @@ def build_site() -> None:
     print(
         f"Built {len(posts_meta)} post(s), {len(categories)} categor(ies), "
         f"about page: {bool(about_page)} -> {OUTPUT_DIR}"
+    )
+
+    subprocess.run(
+        [sys.executable, "-m", "pagefind", "--site", str(OUTPUT_DIR)], check=True
     )
 
 
