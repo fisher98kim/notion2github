@@ -24,13 +24,15 @@ If you'd rather work from the terminal, first create an empty repo on GitHub nam
 git clone --depth 1 https://github.com/fisher98kim/notion2github.git <your-username>.github.io
 cd <your-username>.github.io
 rm -rf .git && git init
-git remote add origin https://github.com/<your-username>/<your-username>.github.io.git
+git remote add origin git@github.com:<your-username>/<your-username>.github.io.git
 git add -A && git commit -m "Initial commit from notion2github"
 git branch -M main
 git push -u origin main
 ```
 
 `rm -rf .git` matters here — without it you'd drag this template's commit history (and its original author) into your own repo. Since this creates a plain repo with no fork relationship, Actions works the same as Option A (enabled by default, no extra steps).
+
+The `git remote add` above uses SSH (`git@github.com:...`) so you're not prompted for a password/token on every push — this assumes you already have an SSH key added to your GitHub account ([docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)). No SSH key set up? Use the HTTPS form instead: `https://github.com/<your-username>/<your-username>.github.io.git`.
 
 ## 1. Set up Notion
 
@@ -67,6 +69,20 @@ site:
 deploy:
   auto_sync: true       # set to false to disable automatic syncing (manual runs still work)
 ```
+
+**Favicon (optional):** generate a favicon set from a logo/photo at a site like [realfavicongenerator.net](https://realfavicongenerator.net/), then drop the files straight into `static/` (flattened, not in a subfolder):
+
+```
+static/favicon.ico
+static/favicon-32x32.png
+static/favicon-16x16.png
+static/apple-touch-icon.png
+static/site.webmanifest
+static/android-chrome-192x192.png
+static/android-chrome-512x512.png
+```
+
+`templates/base.html` already links to all of these, so nothing else to configure — just add the files and rebuild. If you skip this, browsers fall back to no favicon (no broken-image icon, just none shown).
 
 ## 3. Configure the GitHub repository
 
@@ -135,6 +151,7 @@ notion_blog/
   site_builder.py        # orchestrates the whole build
 templates/               # Jinja2 templates (base/index/post/about)
 static/style.css         # site styles
+static/favicon.*          # optional favicon set — see section 2
 docs/                     # build output (served by GitHub Pages)
 build.py                  # entry point: python build.py
 .github/workflows/        # build & deploy automation
