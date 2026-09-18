@@ -1,6 +1,7 @@
 {% extends "base.html" %}
-{% block title %}{% if category %}{{ category.name }} · {% endif %}{{ site_title }}{% endblock %}
+{% block title %}{% if category %}{{ category.name }} · {% elif tag %}{{ tag.name }} · {% endif %}{{ site_title }}{% endblock %}
 {% block content %}
-{% if category %}<h1 class="h3 mb-4">{{ category.name }}</h1>{% endif %}
+{% if category %}<h1 class="h3 mb-4"><i class="bi bi-folder"></i> {{ category.name }}</h1>
+{% elif tag %}<h1 class="h3 mb-4"><i class="bi bi-tag-fill"></i> {{ tag.name }}</h1>{% endif %}
 {% include "_post_list.html" %}
 {% endblock %}

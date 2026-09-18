@@ -34,15 +34,17 @@ def fetch_published_posts(client: Client, database_id: str) -> list[dict]:
     return posts
 
 
-def fetch_tag_order(client: Client, database_id: str, property_name: str = "Tag") -> list[str]:
-    """Return multi-select option names in the order defined on the Notion property
-    (the order you see/drag in Notion's "Edit property" panel)."""
+def fetch_option_order(
+    client: Client, database_id: str, property_name: str, prop_type: str
+) -> list[str]:
+    """Return select/multi-select option names in the order defined on the Notion
+    property (the order you see/drag in Notion's "Edit property" panel)."""
     data_source_id = get_data_source_id(client, database_id)
     data_source = client.data_sources.retrieve(data_source_id=data_source_id)
     prop = data_source["properties"].get(property_name)
-    if not prop or prop["type"] != "multi_select":
+    if not prop or prop["type"] != prop_type:
         return []
-    return [option["name"] for option in prop["multi_select"]["options"]]
+    return [option["name"] for option in prop[prop_type]["options"]]
 
 
 def fetch_all_blocks(client: Client, block_id: str) -> list[dict]:

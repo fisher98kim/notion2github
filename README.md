@@ -42,11 +42,11 @@ The `git remote add` above uses SSH (`git@github.com:...`) so you're not prompte
 
    | Property name | Type | Description |
    |---|---|---|
-   | Title | Title (built in) | Post title |
+   | Title | Title (built in) | Post title. Its URL slug is auto-generated from this. A page titled exactly `about` (case-insensitive) becomes your profile/About page instead of a regular post |
    | Status | Status | Options: `Draft`, `Publish` — only `Publish` posts show up on the site |
    | Date | Date | Publish date, used for sorting |
-   | Slug | Text | (optional) URL slug. Auto-generated from the title if left blank. Set it to `about` to make that page your profile/About page instead of a regular post |
-   | Tag | Multi-select | (optional) |
+   | Category | Select | (optional) One category per post. Powers the sidebar nav and `/categories/<slug>/` pages, in the option order you set in Notion |
+   | Tag | Multi-select | (optional) Shown on each post and grouped into `/tags/<slug>/` pages |
    | Summary | Text | (optional) Shown in the post list |
 
 4. On the database page, click `···` (top right) → **Connections** → connect the integration you just created. (Without this, the API only ever returns an empty list.)

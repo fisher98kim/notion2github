@@ -4,8 +4,9 @@
 <article>
   <h1 class="mb-2">{{ title }}</h1>
   <div class="text-body-secondary small mb-4 post-item-meta">
-    <span><i class="bi bi-calendar3"></i> {{ date }}</span>
-    {% for tag in tags %}<a class="badge text-bg-light text-body-secondary text-decoration-none" href="{{ base_path }}/tags/{{ tag.slug }}/"><i class="bi bi-tag-fill"></i> {{ tag.name }}</a>{% endfor %}
+    {% if category %}<div class="post-item-meta-row"><a class="badge text-bg-light text-body-secondary text-decoration-none" href="{{ base_path }}/categories/{{ category.slug }}/"><i class="bi bi-folder-fill"></i> {{ category.name }}</a></div>{% endif %}
+    {% if tags %}<div class="post-item-meta-row">{% for tag in tags %}<a class="badge text-bg-light text-body-secondary text-decoration-none" href="{{ base_path }}/tags/{{ tag.slug }}/"><i class="bi bi-tag-fill"></i> {{ tag.name }}</a>{% endfor %}</div>{% endif %}
+    <div class="post-item-meta-row"><span><i class="bi bi-calendar3"></i> {{ date }}</span></div>
   </div>
   <div class="post-content">
     {{ content | safe }}

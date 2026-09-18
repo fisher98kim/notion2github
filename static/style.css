@@ -88,8 +88,9 @@ body {
 
 /* ---- Post list / post meta ---- */
 .post-item-title { color: var(--bs-link-color); }
-.post-item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .15rem .5rem; }
+.post-item-meta { display: flex; flex-direction: column; align-items: flex-start; gap: .35rem; }
 .post-item-meta .bi { font-size: .9em; }
+.post-item-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: .15rem .5rem; }
 
 /* ---- Post content (raw HTML rendered from Notion blocks) ---- */
 .post-content { margin-top: 1.5rem; }

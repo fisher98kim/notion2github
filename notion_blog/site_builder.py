@@ -17,6 +17,7 @@ from .renderer import (
     get_date,
     get_multi_select,
     get_rich_text,
+    get_select,
     get_title,
     slugify,
 )
@@ -26,9 +27,9 @@ TEMPLATES_DIR = ROOT / "templates"
 STATIC_DIR = ROOT / "static"
 OUTPUT_DIR = ROOT / "docs"
 
-# A post whose Slug property is exactly this becomes the profile page at
-# /about/ (linked from the site title) instead of a regular blog post.
-ABOUT_SLUG = "about"
+# A post whose title is exactly this becomes the profile page at /about/
+# (linked from the site title) instead of a regular blog post.
+ABOUT_TITLE = "about"
 
 
 def build_site(local: bool = False) -> None:
@@ -52,7 +53,8 @@ def build_site(local: bool = False) -> None:
 
     client = notion_api.get_client(token)
     pages = notion_api.fetch_published_posts(client, database_id)
-    tag_order = notion_api.fetch_tag_order(client, database_id)
+    tag_order = notion_api.fetch_option_order(client, database_id, "Tag", "multi_select")
+    category_order = notion_api.fetch_option_order(client, database_id, "Category", "select")
 
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
     post_template = env.get_template("post.html")
@@ -72,9 +74,10 @@ def build_site(local: bool = False) -> None:
     page_id_to_path = {}
     for page in pages:
         title = get_title(page)
-        raw_slug = get_rich_text(page, "Slug")
-        slug = raw_slug or slugify(title)
-        is_about = raw_slug.strip().lower() == ABOUT_SLUG
+        slug = slugify(title)
+        is_about = title.strip().lower() == ABOUT_TITLE
+        category_name = get_select(page, "Category")
+        category = {"name": category_name, "slug": slugify(category_name)} if category_name else None
         page_meta.append(
             {
                 "page": page,
@@ -82,6 +85,7 @@ def build_site(local: bool = False) -> None:
                 "slug": slug,
                 "is_about": is_about,
                 "date": get_date(page, "Date"),
+                "category": category,
                 "tags": [{"name": t, "slug": slugify(t)} for t in get_multi_select(page, "Tag")],
                 "summary": get_rich_text(page, "Summary"),
             }
@@ -106,12 +110,13 @@ def build_site(local: bool = False) -> None:
 
         posts_content[meta["slug"]] = content_html
         posts_meta.append(
-            {k: meta[k] for k in ("title", "slug", "date", "tags", "summary")}
+            {k: meta[k] for k in ("title", "slug", "date", "category", "tags", "summary")}
         )
 
     posts_meta.sort(key=lambda p: p["date"], reverse=True)
 
-    categories = _build_categories(posts_meta, tag_order)
+    categories = _build_categories(posts_meta, category_order)
+    tag_list = _build_tags(posts_meta, tag_order)
 
     for post in posts_meta:
         post_dir = OUTPUT_DIR / "posts" / post["slug"]
@@ -122,6 +127,7 @@ def build_site(local: bool = False) -> None:
             categories=categories,
             title=post["title"],
             date=post["date"],
+            category=post["category"],
             tags=post["tags"],
             content=posts_content[post["slug"]],
             **profile_context,
@@ -138,14 +144,27 @@ def build_site(local: bool = False) -> None:
     (OUTPUT_DIR / "index.html").write_text(index_html, encoding="utf-8")
 
     for category in categories:
-        tag_dir = OUTPUT_DIR / "tags" / category["slug"]
-        tag_dir.mkdir(parents=True, exist_ok=True)
-        tag_html = index_template.render(
+        category_dir = OUTPUT_DIR / "categories" / category["slug"]
+        category_dir.mkdir(parents=True, exist_ok=True)
+        category_html = index_template.render(
             site_title=site_title,
             base_path=base_path,
             posts=category["posts"],
             categories=categories,
             category=category,
+            **profile_context,
+        )
+        (category_dir / "index.html").write_text(category_html, encoding="utf-8")
+
+    for tag in tag_list:
+        tag_dir = OUTPUT_DIR / "tags" / tag["slug"]
+        tag_dir.mkdir(parents=True, exist_ok=True)
+        tag_html = index_template.render(
+            site_title=site_title,
+            base_path=base_path,
+            posts=tag["posts"],
+            categories=categories,
+            tag=tag,
             **profile_context,
         )
         (tag_dir / "index.html").write_text(tag_html, encoding="utf-8")
@@ -165,7 +184,7 @@ def build_site(local: bool = False) -> None:
         (about_dir / "index.html").write_text(about_html, encoding="utf-8")
 
     print(
-        f"Built {len(posts_meta)} post(s), {len(categories)} categor(ies), "
+        f"Built {len(posts_meta)} post(s), {len(categories)} categor(ies), {len(tag_list)} tag(s), "
         f"about page: {bool(about_page)} -> {OUTPUT_DIR}"
     )
 
@@ -174,7 +193,25 @@ def build_site(local: bool = False) -> None:
     )
 
 
-def _build_categories(posts_meta: list[dict], tag_order: list[str]) -> list[dict]:
+def _build_categories(posts_meta: list[dict], category_order: list[str]) -> list[dict]:
+    """Group posts by their single Category, for the sidebar nav and /categories/ pages."""
+    by_slug: dict[str, dict] = {}
+    for post in posts_meta:
+        category = post["category"]
+        if not category:
+            continue
+        entry = by_slug.setdefault(
+            category["slug"], {"name": category["name"], "slug": category["slug"], "posts": []}
+        )
+        entry["posts"].append(post)
+    for entry in by_slug.values():
+        entry["count"] = len(entry["posts"])
+    order_index = {slugify(name): i for i, name in enumerate(category_order)}
+    return sorted(by_slug.values(), key=lambda c: order_index.get(c["slug"], len(order_index)))
+
+
+def _build_tags(posts_meta: list[dict], tag_order: list[str]) -> list[dict]:
+    """Group posts by Tag, for the /tags/ pages (not shown in the sidebar nav)."""
     by_slug: dict[str, dict] = {}
     for post in posts_meta:
         for tag in post["tags"]:
@@ -185,7 +222,7 @@ def _build_categories(posts_meta: list[dict], tag_order: list[str]) -> list[dict
     for entry in by_slug.values():
         entry["count"] = len(entry["posts"])
     order_index = {slugify(name): i for i, name in enumerate(tag_order)}
-    return sorted(by_slug.values(), key=lambda c: order_index.get(c["slug"], len(order_index)))
+    return sorted(by_slug.values(), key=lambda t: order_index.get(t["slug"], len(order_index)))
 
 
 if __name__ == "__main__":
