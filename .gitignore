@@ -6,3 +6,8 @@ __pycache__/
 # Build output — deployed straight to GitHub Pages by the Actions workflow,
 # no longer committed to the repo.
 docs/
+
+# Local build cache (fetched Notion blocks + downloaded images), keyed by
+# each page's last_edited_time — safe to delete any time to force a full
+# rebuild.
+.notion_cache/

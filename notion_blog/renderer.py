@@ -94,6 +94,13 @@ _LIST_TYPES = {
     "numbered_list_item": "ol",
 }
 
+# Block types whose own renderer already consumes _children (list items fold
+# theirs in via _render_list_item in the loop below; toggle and table handle
+# theirs inside _render_block). Every other block type can carry indented
+# sub-blocks too (Notion lets you Tab-indent under a paragraph, heading, ...)
+# and blocks_to_html must render those explicitly or they're silently dropped.
+_SELF_RENDERS_CHILDREN = {"toggle", "table", *_LIST_TYPES}
+
 
 def blocks_to_html(blocks: list[dict]) -> str:
     html_parts = []
@@ -110,6 +117,8 @@ def blocks_to_html(blocks: list[dict]) -> str:
             html_parts.append(f"<{tag}>{''.join(items)}</{tag}>")
             continue
         html_parts.append(_render_block(block))
+        if block.get("_children") and btype not in _SELF_RENDERS_CHILDREN:
+            html_parts.append(f'<div class="ms-4">{blocks_to_html(block["_children"])}</div>')
         i += 1
     return "\n".join(p for p in html_parts if p)
 

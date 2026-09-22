@@ -10,7 +10,12 @@ import requests
 _FILE_BLOCK_TYPES = ("image", "pdf", "file")
 
 
-def localize_images(blocks: list[dict], uploads_dir: Path, slug: str, base_path: str) -> list[dict]:
+def localize_images(blocks: list[dict], uploads_dir: Path, slug: str) -> list[dict]:
+    """Downloads each file block's image and rewrites it to a root-relative
+    /static/uploads/... URL. Deliberately base_path-free: the result is cached
+    across builds (see cache.py), and a build's base_path can vary (local
+    preview vs. a subpath-deployed production build) — apply_base_path()
+    below applies that prefix fresh on every build instead."""
     uploads_dir.mkdir(parents=True, exist_ok=True)
     for block in blocks:
         btype = block["type"]
@@ -19,14 +24,30 @@ def localize_images(blocks: list[dict], uploads_dir: Path, slug: str, base_path:
             filename = _download(url, uploads_dir, slug)
             localized = {
                 "type": "external",
-                "external": {"url": f"{base_path}/static/uploads/{filename}"},
+                "external": {"url": f"/static/uploads/{filename}"},
                 "caption": block[btype].get("caption", []),
             }
             if "name" in block[btype]:
                 localized["name"] = block[btype]["name"]
             block[btype] = localized
         if block.get("_children"):
-            block["_children"] = localize_images(block["_children"], uploads_dir, slug, base_path)
+            block["_children"] = localize_images(block["_children"], uploads_dir, slug)
+    return blocks
+
+
+def apply_base_path(blocks: list[dict], base_path: str) -> list[dict]:
+    """Prefixes the root-relative /static/uploads/... URLs localize_images
+    produces with the site's base_path. A separate, cheap pass so cached
+    blocks stay base_path-agnostic (see localize_images's docstring)."""
+    if base_path:
+        for block in blocks:
+            data = block.get(block["type"])
+            if isinstance(data, dict) and data.get("type") == "external":
+                url = data["external"]["url"]
+                if url.startswith("/static/uploads/"):
+                    data["external"]["url"] = base_path + url
+            if block.get("_children"):
+                apply_base_path(block["_children"], base_path)
     return blocks
 
 

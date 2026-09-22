@@ -1,5 +1,6 @@
 """Orchestrates: fetch posts from Notion -> render -> write static site to docs/."""
 
+import copy
 import os
 import shutil
 import subprocess
@@ -8,9 +9,9 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from . import notion_api
+from . import cache, notion_api
 from .config import load_config
-from .images import localize_images
+from .images import apply_base_path, localize_images
 from .links import linkify_internal_pages
 from .renderer import (
     blocks_to_html,
@@ -94,13 +95,24 @@ def build_site(local: bool = False) -> None:
             "about" if is_about else f"posts/{slug}"
         )
 
-    # Pass 2: fetch each page's content and render it.
+    # Pass 2: fetch each page's content and render it. Unedited pages (by
+    # last_edited_time) reuse cached blocks instead of hitting Notion/S3 again.
+    manifest = cache.load()
     posts_meta = []
     posts_content = {}
     about_page = None
     for meta in page_meta:
-        blocks = notion_api.fetch_all_blocks(client, meta["page"]["id"])
-        blocks = localize_images(blocks, OUTPUT_DIR / "static" / "uploads", meta["slug"], base_path)
+        page_id = meta["page"]["id"]
+        last_edited_time = meta["page"]["last_edited_time"]
+        cached_blocks = cache.get_blocks(manifest, page_id, last_edited_time)
+        if cached_blocks is not None:
+            blocks = copy.deepcopy(cached_blocks)
+        else:
+            blocks = notion_api.fetch_all_blocks(client, page_id)
+            blocks = localize_images(blocks, cache.UPLOADS_DIR, meta["slug"])
+            cache.set_blocks(manifest, page_id, last_edited_time, copy.deepcopy(blocks))
+
+        blocks = apply_base_path(blocks, base_path)
         blocks = linkify_internal_pages(blocks, page_id_to_path, base_path)
         content_html = blocks_to_html(blocks)
 
@@ -112,6 +124,10 @@ def build_site(local: bool = False) -> None:
         posts_meta.append(
             {k: meta[k] for k in ("title", "slug", "date", "category", "tags", "summary")}
         )
+
+    cache.save(manifest)
+    if cache.UPLOADS_DIR.exists():
+        shutil.copytree(cache.UPLOADS_DIR, OUTPUT_DIR / "static" / "uploads", dirs_exist_ok=True)
 
     posts_meta.sort(key=lambda p: p["date"], reverse=True)
 
