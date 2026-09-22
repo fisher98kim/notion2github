@@ -51,12 +51,37 @@ jobs:
         if: steps.config.outputs.should_build == 'true'
         uses: actions/configure-pages@v6
 
+      # Restores notion_blog/cache.py's build cache (fetched blocks + downloaded
+      # images), keyed by each page's last_edited_time. The exact key never
+      # matches on purpose — this run's manifest hash isn't known until after
+      # the build below — so it always falls through to restore-keys and pulls
+      # whatever was most recently saved.
+      - name: Restore Notion build cache
+        if: steps.config.outputs.should_build == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: .notion_cache
+          key: notion-cache-${{ github.run_id }}
+          restore-keys: |
+            notion-cache-
+
       - name: Build site from Notion
         if: steps.config.outputs.should_build == 'true'
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
         run: python build.py
+
+      # Keyed by the now-updated manifest's content hash: when no post
+      # changed this hour, the hash matches the cache already saved above and
+      # GitHub skips this save — so a new cache is only created on an hour
+      # that actually touched Notion content, instead of every single run.
+      - name: Save Notion build cache
+        if: steps.config.outputs.should_build == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .notion_cache
+          key: notion-cache-${{ hashFiles('.notion_cache/manifest.json') }}
 
       - name: Upload Pages artifact
         if: steps.config.outputs.should_build == 'true'
