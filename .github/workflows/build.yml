@@ -12,10 +12,12 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment.
+# Allow one concurrent deployment. A newer run cancels an in-progress one, so
+# a deploy stuck on GitHub's side (e.g. hung at the environment gate) gets
+# cleared by the next run instead of blocking every run behind it.
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
